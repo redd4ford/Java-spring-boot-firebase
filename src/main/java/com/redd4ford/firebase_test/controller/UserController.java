@@ -35,16 +35,17 @@ public class UserController {
       log.info("GET    200 : " + email);
       return new ResponseEntity<>(userService.getByEmail(email), HttpStatus.OK);
     } else {
-      log.info("GET    404 : " + email);
+      log.error("GET    404 : " + email);
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
   }
 
   @PostMapping
   public ResponseEntity<UserDto> createUser(@RequestBody @Valid UserDto userDto,
-                                            BindingResult bindingResult) {
-    if (bindingResult.hasErrors()) {
-      log.info("CREATE 400 : " + userDto.getEmail());
+                                            BindingResult bindingResult)
+      throws ExecutionException, InterruptedException {
+    if (bindingResult.hasErrors() || userService.getByEmail(userDto.getEmail()) != null) {
+      log.error("CREATE 400 : " + userDto.getEmail());
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     } else {
       log.info("CREATE 200 : " + userDto.getEmail());
@@ -59,13 +60,13 @@ public class UserController {
       throws InterruptedException, ExecutionException {
     if (userService.getByEmail(email) != null) {
       if (bindingResult.hasErrors()) {
-        log.info("UPDATE 400 : " + userDto.getEmail());
+        log.error("UPDATE 400 : " + userDto.getEmail());
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
       }
       log.info("UPDATE 200 : " + userDto.getEmail());
       return new ResponseEntity<>(userService.save(userDto), HttpStatus.OK);
     } else {
-      log.info("UPDATE 404 : " + userDto.getEmail());
+      log.error("UPDATE 404 : " + userDto.getEmail());
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
   }
@@ -78,7 +79,7 @@ public class UserController {
       log.info("DELETE 200 : " + email);
       return new ResponseEntity<>(HttpStatus.OK);
     } else {
-      log.info("DELETE 404 : " + email);
+      log.error("DELETE 404 : " + email);
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
   }
