@@ -43,8 +43,7 @@ public abstract class FirebaseRepository<T, ID> {
     ApiFuture<DocumentSnapshot> future = docRef.get();
     DocumentSnapshot document = future.get();
 
-
-    assert document.exists() : "No document found - " + id.toString();
+    assert document != null : "No document found - " + id;
     // convert document to POJO
     return document.toObject(objectClassName);
   }
@@ -60,6 +59,10 @@ public abstract class FirebaseRepository<T, ID> {
 
   public void deleteById(@NotNull ID id) {
     database.collection(collectionName).document(id.toString()).delete();
+  }
+
+  public Integer countAll() throws ExecutionException, InterruptedException {
+    return findAll().size();
   }
 
 }
