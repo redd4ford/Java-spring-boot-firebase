@@ -7,6 +7,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserMapper {
 
+  public UserMapper() {
+  }
+
   public UserDto mapUserToDto(User user) {
     if (user == null) {
       return null;
@@ -14,10 +17,17 @@ public class UserMapper {
 
     UserDto.UserDtoBuilder userDto = UserDto.builder();
 
+    userDto.id(user.getId());
     userDto.username(user.getUsername());
     userDto.email(user.getEmail());
     userDto.password(user.getPassword());
     userDto.location(user.getLocation());
+    userDto.posts(user.getPosts());
+    if (user.getPosts() != null) {
+      userDto.postCounter(user.getPosts().size());
+    } else {
+      userDto.postCounter(0);
+    }
 
     return userDto.build();
   }
@@ -29,6 +39,7 @@ public class UserMapper {
 
     User.UserBuilder user = User.builder();
 
+    user.id(userDto.getId());
     user.username(userDto.getUsername());
     user.email(userDto.getEmail());
     user.location(userDto.getLocation());
