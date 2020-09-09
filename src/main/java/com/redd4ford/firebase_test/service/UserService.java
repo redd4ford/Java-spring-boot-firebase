@@ -23,27 +23,43 @@ public class UserService {
     this.userMapper = userMapper;
   }
 
-  public List<UserDto> getAll()
-      throws ExecutionException, InterruptedException {
+  public List<UserDto> getAll() throws ExecutionException, InterruptedException {
     return userRepository.findAll()
         .stream()
         .map(userMapper::mapUserToDto)
         .collect(toList());
   }
 
-  public UserDto getByEmail(String email)
-      throws ExecutionException, InterruptedException {
-    User user = userRepository.findById(email);
+  public UserDto getById(Integer id) throws ExecutionException, InterruptedException {
+    User user = userRepository.findById(id);
     return userMapper.mapUserToDto(user);
   }
 
   public UserDto save(@NotNull UserDto userDto) {
-    User user = userRepository.save(userMapper.mapDtoToUser(userDto), userDto.getEmail());
+    User user = userRepository.save(userMapper.mapDtoToUser(userDto), userDto.getId());
     return userMapper.mapUserToDto(user);
   }
 
-  public void delete(String email) {
-    userRepository.deleteById(email);
+  public void delete(Integer id) {
+    userRepository.deleteById(id);
+  }
+
+  public boolean existsByEmail(String email)
+      throws ExecutionException, InterruptedException {
+    return userRepository.findByEmail(email) != null;
+  }
+
+  public boolean existsByUsername(String username)
+      throws ExecutionException, InterruptedException {
+    return userRepository.findByUsername(username) != null;
+  }
+
+  public void setId(UserDto userDto) throws ExecutionException, InterruptedException {
+    Integer i = userRepository.countAll() + 1;
+    while (getById(i) != null) {
+      i++;
+    }
+    userDto.setId(i);
   }
 
 }
