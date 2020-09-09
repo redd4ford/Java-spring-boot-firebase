@@ -5,9 +5,12 @@ import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 @Component
 public class User {
+
+  private Integer id;
 
   @NotBlank(message = "Username cannot be null")
   private String username;
@@ -23,11 +26,17 @@ public class User {
   @NotBlank(message = "Location cannot be null")
   private String location;
 
-  public User(String username, String email, String password, String location) {
+  // OneToMany
+  private List<Post> posts;
+
+  public User(Integer id, String username, String email, String password, String location,
+              List<Post> posts) {
+    this.id = id;
     this.username = username;
     this.email = email;
     this.password = password;
     this.location = location;
+    this.posts = posts;
   }
 
   public User() {
@@ -35,6 +44,14 @@ public class User {
 
   public static UserBuilder builder() {
     return new UserBuilder();
+  }
+
+  public Integer getId() {
+    return id;
+  }
+
+  public void setId(Integer id) {
+    this.id = id;
   }
 
   public String getUsername() {
@@ -69,13 +86,28 @@ public class User {
     this.location = location;
   }
 
+  public List<Post> getPosts() {
+    return posts;
+  }
+
+  public void setPosts(List<Post> posts) {
+    this.posts = posts;
+  }
+
   public static class UserBuilder {
+    private Integer id;
     private String username;
     private String email;
     private String password;
     private String location;
+    private List<Post> posts;
 
     UserBuilder() {
+    }
+
+    public UserBuilder id(Integer id) {
+      this.id = id;
+      return this;
     }
 
     public UserBuilder username(String username) {
@@ -98,12 +130,18 @@ public class User {
       return this;
     }
 
+    public UserBuilder posts(List<Post> posts) {
+      this.posts = posts;
+      return this;
+    }
+
     public User build() {
-      return new User(username, email, password, location);
+      return new User(id, username, email, password, location, posts);
     }
 
     public String toString() {
-      return "User.UserBuilder(username=" + this.username +
+      return "User.UserBuilder(id=" + this.id +
+          ", username=" + this.username +
           ", email=" + this.email +
           ", password=" + this.password +
           ", location=" + this.location + ")";
