@@ -28,14 +28,14 @@ public class UserController {
     return userService.getAll();
   }
 
-  @GetMapping("/{email}")
-  public ResponseEntity<UserDto> getUser(@PathVariable("email") String email)
+  @GetMapping("/{id}")
+  public ResponseEntity<UserDto> getUser(@PathVariable("id") Integer id)
       throws InterruptedException, ExecutionException {
-    if (userService.getByEmail(email) != null) {
-      log.info("GET    200 : " + email);
-      return new ResponseEntity<>(userService.getByEmail(email), HttpStatus.OK);
+    if (userService.getById(id) != null) {
+      log.info("GET    200 : id" + id);
+      return new ResponseEntity<>(userService.getById(id), HttpStatus.OK);
     } else {
-      log.error("GET    404 : " + email);
+      log.error("GET    404 : id" + id);
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
   }
@@ -44,42 +44,45 @@ public class UserController {
   public ResponseEntity<UserDto> createUser(@RequestBody @Valid UserDto userDto,
                                             BindingResult bindingResult)
       throws ExecutionException, InterruptedException {
-    if (bindingResult.hasErrors() || userService.getByEmail(userDto.getEmail()) != null) {
-      log.error("CREATE 400 : " + userDto.getEmail());
+    userService.setId(userDto);
+    if (bindingResult.hasErrors() || userService.existsByEmail(userDto.getEmail()) ||
+        userService.existsByUsername(userDto.getUsername())) {
+      log.error("CREATE 400 : id" + userDto.getId());
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     } else {
-      log.info("CREATE 200 : " + userDto.getEmail());
+      log.info("CREATE 200 : id" + userDto.getId());
       return new ResponseEntity<>(userService.save(userDto), HttpStatus.OK);
     }
   }
 
-  @PutMapping("/{email}")
-  public ResponseEntity<UserDto> updateUser(@PathVariable("email") String email,
+  @PutMapping("/{id}")
+  public ResponseEntity<UserDto> updateUser(@PathVariable("id") Integer id,
                                             @RequestBody @Valid UserDto userDto,
                                             BindingResult bindingResult)
       throws InterruptedException, ExecutionException {
-    if (userService.getByEmail(email) != null) {
+    if (userService.getById(id) != null) {
       if (bindingResult.hasErrors()) {
-        log.error("UPDATE 400 : " + userDto.getEmail());
+        log.error("UPDATE 400 : id" + id);
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
       }
-      log.info("UPDATE 200 : " + userDto.getEmail());
+      log.info("UPDATE 200 : id" + id);
+      userDto.setId(id);
       return new ResponseEntity<>(userService.save(userDto), HttpStatus.OK);
     } else {
-      log.error("UPDATE 404 : " + userDto.getEmail());
+      log.error("UPDATE 404 : id" + id);
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
   }
 
-  @DeleteMapping("/{email}")
-  public ResponseEntity<Void> deleteUser(@PathVariable("email") String email)
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> deleteUser(@PathVariable("id") Integer id)
       throws ExecutionException, InterruptedException {
-    if (userService.getByEmail(email) != null) {
-      userService.delete(email);
-      log.info("DELETE 200 : " + email);
+    if (userService.getById(id) != null) {
+      userService.delete(id);
+      log.info("DELETE 200 : id" + id);
       return new ResponseEntity<>(HttpStatus.OK);
     } else {
-      log.error("DELETE 404 : " + email);
+      log.error("DELETE 404 : id" + id);
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
   }
