@@ -44,14 +44,14 @@ public class UserController {
   public ResponseEntity<UserDto> createUser(@RequestBody @Valid UserDto userDto,
                                             BindingResult bindingResult)
       throws ExecutionException, InterruptedException {
-    userService.setId(userDto);
+    userDto.setId(userService.getIdleId(userDto));
     if (bindingResult.hasErrors() || userService.existsByEmail(userDto.getEmail()) ||
         userService.existsByUsername(userDto.getUsername())) {
       log.error("CREATE 400 : id" + userDto.getId());
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     } else {
       log.info("CREATE 200 : id" + userDto.getId());
-      return new ResponseEntity<>(userService.save(userDto), HttpStatus.OK);
+      return new ResponseEntity<>(userService.save(userDto, userDto.getId()), HttpStatus.OK);
     }
   }
 
@@ -67,7 +67,7 @@ public class UserController {
       }
       log.info("UPDATE 200 : id" + id);
       userDto.setId(id);
-      return new ResponseEntity<>(userService.save(userDto), HttpStatus.OK);
+      return new ResponseEntity<>(userService.save(userDto, userDto.getId()), HttpStatus.OK);
     } else {
       log.error("UPDATE 404 : id" + id);
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);

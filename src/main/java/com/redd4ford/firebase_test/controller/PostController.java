@@ -1,6 +1,8 @@
 package com.redd4ford.firebase_test.controller;
 
 import com.redd4ford.firebase_test.dto.PostDto;
+import com.redd4ford.firebase_test.model.Community;
+import com.redd4ford.firebase_test.service.CommunityService;
 import com.redd4ford.firebase_test.service.PostService;
 import com.redd4ford.firebase_test.service.UserService;
 import org.slf4j.Logger;
@@ -27,15 +29,18 @@ public class PostController {
   @Autowired
   private UserService userService;
 
+  @Autowired
+  private CommunityService communityService;
+
   @GetMapping
-  public List<PostDto> getAllPosts() throws InterruptedException, ExecutionException {
+  public List<PostDto> getAll() throws InterruptedException, ExecutionException {
     return postService.getAll();
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<PostDto> getPost(@PathVariable("id") Integer id)
+  public ResponseEntity<PostDto> getOne(@PathVariable("id") Integer id)
       throws InterruptedException, ExecutionException {
-    if (postService.getById(id) != null) {
+    if (postService.isExistById(id)) {
       log.info("GET    200 : id" + id);
       return new ResponseEntity<>(postService.getById(id), HttpStatus.OK);
     } else {
@@ -45,32 +50,35 @@ public class PostController {
   }
 
   @PostMapping
-  public ResponseEntity<PostDto> createPost(@RequestBody @Valid PostDto postDto,
+  public ResponseEntity<PostDto> create(@RequestBody @Valid PostDto postDto,
                                             BindingResult bindingResult)
       throws ExecutionException, InterruptedException {
-    postService.setId(postDto);
-    if (bindingResult.hasErrors() || !userService.existsByUsername(postDto.getAuthorUsername())) {
+    postDto.setId(postService.getIdleId(postDto));
+    if (bindingResult.hasErrors() ||
+        !userService.isExistByUsername(postDto.getAuthorUsername()) ||
+        !communityService.isExistByName(postDto.getCommunityName())) {
       log.error("CREATE 400 : id" + postDto.getId());
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     } else {
       log.info("CREATE 200 : id" + postDto.getId());
-      postService.establishManyToOne(postDto);
-      return new ResponseEntity<>(postService.save(postDto), HttpStatus.OK);
+      postService.establishPostsUser(postDto);
+      postService.establishPostsCommunity(postDto);
+      return new ResponseEntity<>(postService.save(postDto, postDto.getId()), HttpStatus.OK);
     }
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<PostDto> updatePost(@PathVariable("id") Integer id,
+  public ResponseEntity<PostDto> update(@PathVariable("id") Integer id,
                                             @RequestBody @Valid PostDto postDto,
                                             BindingResult bindingResult)
       throws InterruptedException, ExecutionException {
-    if (postService.getById(id) != null) {
+    if (postService.isExistById(id)) {
       if (bindingResult.hasErrors()) {
         log.error("UPDATE 400 : id" + id);
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
       }
       log.info("UPDATE 200 : id" + id);
-      return new ResponseEntity<>(postService.save(postDto), HttpStatus.OK);
+      return new ResponseEntity<>(postService.save(postDto, postDto.getId()), HttpStatus.OK);
     } else {
       log.error("UPDATE 404 : id" + id);
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -78,9 +86,8 @@ public class PostController {
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deletePost(@PathVariable("id") Integer id)
-      throws ExecutionException, InterruptedException {
-    if (postService.getById(id) != null) {
+  public ResponseEntity<Void> deletePost(@PathVariable("id") Integer id) {
+    if (postService.isExistById(id)) {
       postService.delete(id);
       log.info("DELETE 200 : id" + id);
       return new ResponseEntity<>(HttpStatus.OK);
