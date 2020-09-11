@@ -4,11 +4,13 @@ public class PostDto {
 
   private Integer id;
   private String authorUsername;
+  private String communityName;
   private String text;
 
-  public PostDto(Integer id, String authorUsername, String text) {
+  public PostDto(Integer id, String authorUsername, String communityName, String text) {
     this.id = id;
     this.authorUsername = authorUsername;
+    this.communityName = communityName;
     this.text = text;
   }
 
@@ -35,6 +37,14 @@ public class PostDto {
     this.authorUsername = authorUsername;
   }
 
+  public String getCommunityName() {
+    return communityName;
+  }
+
+  public void setCommunityName(String communityName) {
+    this.communityName = communityName;
+  }
+
   public String getText() {
     return text;
   }
@@ -47,6 +57,7 @@ public class PostDto {
   public static class PostDtoBuilder {
     private Integer id;
     private String authorUsername;
+    private String communityName;
     private String text;
 
     PostDtoBuilder() {
@@ -62,18 +73,24 @@ public class PostDto {
       return this;
     }
 
+    public PostDtoBuilder communityName(String communityName) {
+      this.communityName = communityName;
+      return this;
+    }
+
     public PostDtoBuilder text(String text) {
       this.text = text;
       return this;
     }
 
     public PostDto build() {
-      return new PostDto(id, authorUsername, text);
+      return new PostDto(id, authorUsername, communityName, text);
     }
 
     public String toString() {
       return "PostDto.PostDtoBuilder(id=" + this.id +
           ", authorUsername=" + this.authorUsername +
+          ", communityName=" + this.communityName +
           ", text=" + this.text + ")";
     }
   }

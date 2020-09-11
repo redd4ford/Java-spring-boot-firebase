@@ -29,14 +29,17 @@ public class UserDto {
 
   private List<Post> posts;
 
+  private List<String> communityNames;
+
   public UserDto(int id, String username, String email, String location, String password,
-                 List<Post> posts, Integer postCounter) {
+                 List<Post> posts, List<String> communityNames, Integer postCounter) {
     this.id = id;
     this.username = username;
     this.email = email;
     this.location = location;
     this.password = password;
     this.posts = posts;
+    this.communityNames = communityNames;
     this.postCounter = postCounter;
   }
 
@@ -103,6 +106,14 @@ public class UserDto {
     this.postCounter = postCounter;
   }
 
+  public List<String> getCommunityNames() {
+    return communityNames;
+  }
+
+  public void setCommunityNames(List<String> communityNames) {
+    this.communityNames = communityNames;
+  }
+
   public static class UserDtoBuilder {
     private int id;
     private String username;
@@ -111,6 +122,7 @@ public class UserDto {
     private String password;
     private Integer postCounter;
     private List<Post> posts;
+    private List<String> communityNames;
 
     UserDtoBuilder() {
     }
@@ -150,8 +162,14 @@ public class UserDto {
       return this;
     }
 
+    public UserDtoBuilder communityNames(List<String> communityNames) {
+      this.communityNames = communityNames;
+      return this;
+    }
+
     public UserDto build() {
-      return new UserDto(id, username, email, location, password, posts, postCounter);
+      return new UserDto(id, username, email, location, password, posts, communityNames,
+          postCounter);
     }
 
     public String toString() {
