@@ -29,14 +29,18 @@ public class User {
   // OneToMany
   private List<Post> posts;
 
+  // ManyToMany
+  private List<Integer> communityIds;
+
   public User(Integer id, String username, String email, String password, String location,
-              List<Post> posts) {
+              List<Post> posts, List<Integer> communityIds) {
     this.id = id;
     this.username = username;
     this.email = email;
     this.password = password;
     this.location = location;
     this.posts = posts;
+    this.communityIds = communityIds;
   }
 
   public User() {
@@ -94,6 +98,14 @@ public class User {
     this.posts = posts;
   }
 
+  public List<Integer> getCommunityIds() {
+    return communityIds;
+  }
+
+  public void setCommunityIds(List<Integer> communityIds) {
+    this.communityIds = communityIds;
+  }
+
   public static class UserBuilder {
     private Integer id;
     private String username;
@@ -101,6 +113,7 @@ public class User {
     private String password;
     private String location;
     private List<Post> posts;
+    private List<Integer> communityIds;
 
     UserBuilder() {
     }
@@ -135,8 +148,13 @@ public class User {
       return this;
     }
 
+    public UserBuilder communityIds(List<Integer> communityIds) {
+      this.communityIds = communityIds;
+      return this;
+    }
+
     public User build() {
-      return new User(id, username, email, password, location, posts);
+      return new User(id, username, email, password, location, posts, communityIds);
     }
 
     public String toString() {

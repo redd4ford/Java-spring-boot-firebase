@@ -10,16 +10,20 @@ public class Post {
 
   private Integer id;
 
-  // ManyToOne
-  private Integer userId;
-
   @NotBlank(message = "Message cannot be empty")
   @Length(min = 15, message = "Message should contain at least 15 symbols")
   private String text;
 
-  public Post(Integer id, Integer userId, String text) {
+  // ManyToOne
+  private Integer userId;
+
+  // ManyToOne
+  private Integer communityId;
+
+  public Post(Integer id, Integer userId, Integer communityId, String text) {
     this.id = id;
     this.userId = userId;
+    this.communityId = communityId;
     this.text = text;
   }
 
@@ -42,6 +46,14 @@ public class Post {
     this.userId = userId;
   }
 
+  public Integer getCommunityId() {
+    return communityId;
+  }
+
+  public void setCommunityId(Integer communityId) {
+    this.communityId = communityId;
+  }
+
   public String getText() {
     return text;
   }
@@ -58,6 +70,7 @@ public class Post {
     public Integer id;
     private String text;
     public Integer userId;
+    public Integer communityId;
 
     PostBuilder() {
     }
@@ -72,18 +85,24 @@ public class Post {
       return this;
     }
 
+    public PostBuilder communityId(Integer communityId) {
+      this.communityId = communityId;
+      return this;
+    }
+
     public PostBuilder text(String text) {
       this.text = text;
       return this;
     }
 
     public Post build() {
-      return new Post(id, userId, text);
+      return new Post(id, userId, communityId, text);
     }
 
     public String toString() {
       return "Post.PostBuilder(id=" + this.id +
           ", userId=" + this.userId +
+          ", communityId=" + this.communityId +
           ", text=" + this.text + ")";
     }
 
